@@ -1,0 +1,140 @@
+#include <iostream>
+#include <conio.h> // For kbhit() and getch()
+#include <graphics.h>
+
+// Function prototypes
+void drawSignal(int r, int y, int g);
+void drawCar(int px, int py);
+void drawCar1(int px, int py);
+
+// Constants for window dimensions
+const int screenWidth = 1200;
+const int screenHeight = 660;
+
+// Constants for car movement
+const int carSpeed = 20;
+const int maxCarPosition = 2000;
+
+int main()
+{
+    initwindow(screenWidth, screenHeight);
+    
+    int i = 0;
+    int cm = 0;
+    int r = 0, y = 0, g = 1;
+
+    while (true)
+    {
+        if (kbhit()) // If we press any button of the keyboard, it will return 1
+        {
+            char opt = getch(); // It is used for pausing the car
+            if (opt == 'r' || opt == 'R')
+            {
+                r = 1;
+                g = 0;
+                y = 0;
+            }
+            else if (opt == 'y' || opt == 'Y')
+            {
+                r = 0;
+                y = 1;
+                g = 0;
+            }
+        }
+
+        if (y == 1)
+        {
+            static int loop = 0;
+            loop++;
+            if (loop == 30) // When we press yellow, it needs some time to find green signal
+            {
+                r = 0;
+                y = 0;
+                g = 1;
+                loop = 0;
+            }
+        }
+
+        drawSignal(r, y, g);
+
+        if (r == 1 || y == 1)
+        {
+            if (cm != maxCarPosition) // Movement of car body
+                cm += carSpeed;
+        }
+        else if (g == 1)
+        {
+            cm += carSpeed * 1.5; // Green signal allows faster movement
+        }
+
+        if (cm >= maxCarPosition) // When red signal is on, car goes far from 2000 or more, then it will stop
+        {
+            cm = 0;
+        }
+
+        drawCar(cm, 500);
+        drawCar1(cm, 500);
+
+        delay(50); // This is used to make the car faster
+        cleardevice(); // When the car goes ahead, it clears its previous part
+    }
+
+    getch();
+    closegraph();
+    return 0;
+}
+
+void drawSignal(int r, int y, int g)
+{
+    // Draw traffic signal
+    setcolor(WHITE);
+    rectangle(900, 120, 980, 300); // Upper rectangle of three circles
+    rectangle(930, 300, 950, 550); // Lower rectangle of three circles
+    rectangle(700, 15, 800, 550);  // Road of second car
+    line(800, 15, 800, 550);
+    line(750, 15, 750, 100);
+    line(750, 150, 750, 250);
+    line(750, 300, 750, 400);
+
+    circle(940, 155, 20);
+    circle(940, 210, 20);
+    circle(940, 260, 20);
+
+    if (r == 1)
+    {
+        setcolor(RED);
+        for (int i = 1; i <= 19; i++)
+            circle(940, 155, i);
+    }
+
+    if (y == 1)
+    {
+        setcolor(YELLOW);
+        for (int i = 1; i <= 19; i++)
+            circle(940, 210, i);
+    }
+
+    if (g == 1)
+    {
+        setcolor(GREEN);
+        for (int i = 1; i <= 19; i++)
+            circle(940, 260, i);
+    }
+
+    setcolor(WHITE);
+    line(0, 550, screenWidth, 550);
+    line(10, 605, 150, 605);
+    // ... Add more lines for ticks
+}
+
+void drawCar(int px, int py)
+{
+    // Draw the car
+    // ...
+}
+
+void drawCar1(int px, int py)
+{
+    // Draw the second car
+    // ...
+}
